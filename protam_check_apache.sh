@@ -4,14 +4,10 @@
 CHECK_PROCS="/usr/local/nagios/libexec/check_procs"
 
 # Get apache server mpm
-#SERVER_MPM="$(httpd -V | grep "Server MPM" | awk '{$2=$2;print}')"
 SERVER_MPM="$(httpd -V | grep "Server MPM" | sed 's/^.*://' | sed 's/^[ \t]*//;s/[ \t]*$//')"
-
-#PREFORK="$(grep -i -r --include \*.conf -e "IfModule mpm_prefork_module" /etc/httpd/ | sed 's/:.*//')"
 
 # Get serverlimit configuration file
 CONFIGFILE="$(grep -i -r --include \*.conf -e " serverlimit" /etc/httpd/ | sed 's/:.*//')"
-
 
 # Prefork
 PREFORK_CONFIG="$(sed -n -e '/<IfModule mpm_prefork_module>/,/<\/IfModule>/ p;/<IfModule prefork.c>/,/<\/IfModule>/ p' $CONFIGFILE)"
@@ -21,17 +17,16 @@ SYSTEMMEMORY="$(grep MemTotal /proc/meminfo | sed 's/^.*://' | sed 's/^[ \t]*//;
 SYSTEMMEMORYMB="$(echo $((SYSTEMMEMORY/1024)))"
 SERVERLIMIT_ADVICE="$(awk -vp=$SYSTEMMEMORYMB -vq=$MEMORYFOOTPRINT -vr=1024 'BEGIN{printf "%.0f" ,(p - r) / q}')"
 
-
 # Dynamically set warning and critical tresholds
 HTTPD_WARNING="$(awk -vp=$SERVERLIMIT -vq=0.95 'BEGIN{printf "%.0f" ,p * q}')"
 HTTPD_CRITICAL="$SERVERLIMIT"
 
+# Get and return the actual check output
 CHECK_OUTPUT="$($CHECK_PROCS -C httpd -w $HTTPD_WARNING -c $HTTPD_CRITICAL)"
 RETURN_CODE="$?"
-SERVERLIMIT_ADVICE=400
-
 echo "$CHECK_OUTPUT"
 
+# Generate a warning if serverlimit above advice
 if [ $SERVERLIMIT -gt $SERVERLIMIT_ADVICE ] && [ $RETURN_CODE = 0 ]
 then
   echo "WARNING - Current ServerLimit($SERVERLIMIT) above adviced maximum ServerLimit($SERVERLIMIT_ADVICE)"
@@ -45,7 +40,3 @@ echo "Apache process memory footprint: $MEMORYFOOTPRINT"
 echo "Total system memory: ${SYSTEMMEMORYMB}M"
 echo "Adviced maximum ServerLimit: $SERVERLIMIT_ADVICE"
 exit $RETURN_CODE
-
-
-# Worker config, unused for now
-#WORKER="$(grep -i -r --include \*.conf -e "IfModule worker" /etc/httpd/)"
