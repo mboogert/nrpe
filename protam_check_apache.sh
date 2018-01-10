@@ -8,7 +8,7 @@ SERVER_MPM="$(httpd -V | grep "Server MPM" | sed 's/^.*://' | sed 's/^[ \t]*//;s
 
 # Get serverlimit configuration file
 #CONFIGFILE="$(grep -i -r --include \*.conf -e " serverlimit" /etc/httpd/ | sed 's/:.*//')"
-CONFIGFILE="$(grep -i -r --include \*.conf -e "serverlimit " /etc/httpd/ | grep -v '^.*:.*#' | sed 's/:.*//')"
+CONFIGFILE="$(grep -i -r --include \*.conf -e "serverlimit" /etc/httpd/ | grep -v '^.*:.*#' | sed 's/:.*//')"
 #echo $CONFIGFILE
 
 # Prefork
