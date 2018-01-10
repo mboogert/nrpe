@@ -26,7 +26,7 @@ HTTPD_WARNING="$(awk -vp=$SERVERLIMIT -vq=0.95 'BEGIN{printf "%.0f" ,p * q}')"
 HTTPD_CRITICAL="$SERVERLIMIT"
 
 # Get and return the actual check output
-CHECK_OUTPUT="$($CHECK_PROCS -C httpd -w $HTTPD_WARNING -c $HTTPD_CRITICAL)"
+CHECK_OUTPUT="$($CHECK_PROCS -C httpd -w 1:$HTTPD_WARNING -c 1:$HTTPD_CRITICAL)"
 RETURN_CODE="$?"
 echo "$CHECK_OUTPUT"
 
