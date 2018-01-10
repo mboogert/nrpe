@@ -22,7 +22,7 @@ SYSTEMMEMORYMB="$(echo $((SYSTEMMEMORY/1024)))"
 SERVERLIMIT_ADVICE="$(awk -vp=$SYSTEMMEMORYMB -vq=$MEMORYFOOTPRINT -vr=1024 'BEGIN{printf "%.0f" ,(p - r) / q}')"
 
 # Dynamically set warning and critical tresholds
-HTTPD_WARNING="$(awk -vp=$SERVERLIMIT -vq=0.95 'BEGIN{printf "%.0f" ,p * q}')"
+HTTPD_WARNING="$(awk -vp=$SERVERLIMIT -vq=0.90 'BEGIN{printf "%.0f" ,p * q}')"
 HTTPD_CRITICAL="$SERVERLIMIT"
 
 # Get and return the actual check output
