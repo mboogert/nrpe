@@ -7,11 +7,14 @@ CHECK_PROCS="/usr/local/nagios/libexec/check_procs"
 SERVER_MPM="$(httpd -V | grep "Server MPM" | sed 's/^.*://' | sed 's/^[ \t]*//;s/[ \t]*$//')"
 
 # Get serverlimit configuration file
-CONFIGFILE="$(grep -i -r --include \*.conf -e " serverlimit" /etc/httpd/ | sed 's/:.*//')"
+#CONFIGFILE="$(grep -i -r --include \*.conf -e " serverlimit" /etc/httpd/ | sed 's/:.*//')"
+CONFIGFILE="$(grep -i -r --include \*.conf -e "serverlimit " /etc/httpd/ | grep -v '^.*:.*#' | sed 's/:.*//')"
+#echo $CONFIGFILE
 
 # Prefork
 PREFORK_CONFIG="$(sed -n -e '/<IfModule mpm_prefork_module>/,/<\/IfModule>/ p;/<IfModule prefork.c>/,/<\/IfModule>/ p' $CONFIGFILE)"
-SERVERLIMIT="$(echo "$PREFORK_CONFIG" | grep -i serverlimit | tr '[:upper:]' '[:lower:]' | sed 's/^.*serverlimit.* //')"
+#SERVERLIMIT="$(echo "$PREFORK_CONFIG" | grep -i serverlimit | tr '[:upper:]' '[:lower:]' | sed 's/^.*serverlimit.* //')"
+SERVERLIMIT="$(echo "$PREFORK_CONFIG" | grep -v "^.*#" | grep -i serverlimit | tr '[:upper:]' '[:lower:]' | sed 's/^.*serverlimit.* //')"
 MEMORYFOOTPRINT="$(ps --no-headers -o "rss,cmd" -C httpd | awk '{ sum+=$1 } END { printf ("%d%s\n", sum/NR/1024,"M") }')"
 SYSTEMMEMORY="$(grep MemTotal /proc/meminfo | sed 's/^.*://' | sed 's/^[ \t]*//;s/[ \t]*$//' | sed 's/ .*$//')"
 SYSTEMMEMORYMB="$(echo $((SYSTEMMEMORY/1024)))"
