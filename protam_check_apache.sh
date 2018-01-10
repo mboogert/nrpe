@@ -12,7 +12,7 @@ if [ "$CONFIGFILE" = "" ]
 then
   SERVERLIMIT=256
 else
-  PREFORK_CONFIG="$(sed -n -e '/<IfModule mpm_prefork_module>/,/<\/IfModule>/ p;/<IfModule prefork.c>/,/<\/IfModule>/ p' $CONFIGFILE | uniq)"
+  PREFORK_CONFIG="$(sed -n -e '/<IfModule mpm_prefork_module>/I,/<\/IfModule>/I p;/<IfModule prefork.c>/I,/<\/IfModule>/I p' $CONFIGFILE | uniq)"
   SERVERLIMIT="$(echo "$PREFORK_CONFIG" | grep -v "^.*#" | grep -i serverlimit | tr '[:upper:]' '[:lower:]' | sed 's/^.*serverlimit.*[ \t]//')"
 fi
 
