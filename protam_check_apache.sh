@@ -4,7 +4,7 @@
 CHECK_PROCS="/usr/local/nagios/libexec/check_procs"
 
 # Get apache server mpm
-SERVER_MPM="$(httpd -V &>1 | grep "Server MPM" | sed 's/^.*://' | sed 's/^[ \t]*//;s/[ \t]*$//')"
+SERVER_MPM="$(httpd -V 2>&1 | grep "Server MPM" | sed 's/^.*://' | sed 's/^[ \t]*//;s/[ \t]*$//')"
 
 # Get serverlimit configuration file
 CONFIGFILE="$(grep -i -r --include \*.conf -e "serverlimit" /etc/httpd/ | grep -v '^.*:.*#' | sed 's/:.*//')"
@@ -19,7 +19,8 @@ fi
 MEMORYFOOTPRINT="$(ps --no-headers -o "rss,cmd" -C httpd | awk '{ sum+=$1 } END { printf ("%d%s\n", sum/NR/1024,"M") }')"
 SYSTEMMEMORY="$(grep MemTotal /proc/meminfo | sed 's/^.*://' | sed 's/^[ \t]*//;s/[ \t]*$//' | sed 's/ .*$//')"
 SYSTEMMEMORYMB="$(echo $((SYSTEMMEMORY/1024)))"
-SERVERLIMIT_ADVICE="$(awk -vp=$SYSTEMMEMORYMB -vq=$MEMORYFOOTPRINT -vr=1024 'BEGIN{printf "%.0f" ,(p - r) / q}')"
+SERVERLIMIT_ADVICE_RAW="$(awk -vp=$SYSTEMMEMORYMB -vq=$MEMORYFOOTPRINT -vr=1024 'BEGIN{printf "%.0f" ,(p - r) / q}')"
+SERVERLIMIT_ADVICE="$(awk -vp=$SERVERLIMIT_ADVICE_RAW -vq=1.10 'BEGIN{printf "%.0f" ,p * q}')"
 
 # Dynamically set warning and critical tresholds
 HTTPD_WARNING="$(awk -vp=$SERVERLIMIT -vq=0.90 'BEGIN{printf "%.0f" ,p * q}')"
@@ -33,14 +34,15 @@ echo "$CHECK_OUTPUT"
 # Generate a warning if serverlimit above advice
 if [ $SERVERLIMIT -gt $SERVERLIMIT_ADVICE ] && [ $RETURN_CODE = 0 ]
 then
-  echo "WARNING - Current ServerLimit($SERVERLIMIT) above adviced maximum ServerLimit($SERVERLIMIT_ADVICE)"
+  echo "WARNING - Current ServerLimit($SERVERLIMIT) above adviced maximum ServerLimit +10% ($SERVERLIMIT_ADVICE)"
   echo ""
   RETURN_CODE=1
 fi
 
-echo "Apache MPM: $SERVER_MPM"
-echo "Apache ServerLimit: $SERVERLIMIT"
-echo "Apache process memory footprint: $MEMORYFOOTPRINT"
-echo "Total system memory: ${SYSTEMMEMORYMB}M"
-echo "Adviced maximum ServerLimit: $SERVERLIMIT_ADVICE"
+echo "Apache MPM                                       : $SERVER_MPM"
+echo "Apache ServerLimit                               : $SERVERLIMIT"
+echo "Apache process memory footprint                  : $MEMORYFOOTPRINT"
+echo "Total system memory                              : ${SYSTEMMEMORYMB}M"
+echo "Adviced maximum ServerLimit                      : $SERVERLIMIT_ADVICE"
+echo " (SystemMemory - 1GB ) / MemoryFootprint + 10%"
 exit $RETURN_CODE
