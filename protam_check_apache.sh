@@ -25,8 +25,12 @@ SYSTEMMEMORYMB="$(echo $((SYSTEMMEMORY/1024)))"
 
 # Calculate the adviced maximum memory assignment for apache,
 #     calculation: (system memory - 1GB) / average apache memory + 10%
-if [ $SYSTEMMEMORYMB -lt 1024 ]; then SYSTEMMEMORYMB=1536; fi
-SERVERLIMIT_ADVICE_RAW="$(awk -vp=$SYSTEMMEMORYMB -vq=$MEMORYFOOTPRINT -vr=1024 'BEGIN{printf "%.0f" ,(p - r) / q}')"
+if [ $SYSTEMMEMORYMB -lt 1024 ] 
+then
+  SERVERLIMIT_ADVICE_RAW="$(awk -vp=$SYSTEMMEMORYMB -vq=$MEMORYFOOTPRINT -vr=512 'BEGIN{printf "%.0f" ,(p - r) / q}')"
+else
+  SERVERLIMIT_ADVICE_RAW="$(awk -vp=$SYSTEMMEMORYMB -vq=$MEMORYFOOTPRINT -vr=1024 'BEGIN{printf "%.0f" ,(p - r) / q}')"
+fi
 SERVERLIMIT_ADVICE="$(awk -vp=$SERVERLIMIT_ADVICE_RAW -vq=1.10 'BEGIN{printf "%.0f" ,p * q}')"
 
 # Dynamically set warning and critical tresholds from configured serverlimit directive
