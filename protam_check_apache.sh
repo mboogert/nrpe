@@ -4,7 +4,7 @@
 CHECK_PROCS="/usr/local/nagios/libexec/check_procs"
 
 # Get apache server mpm
-SERVER_MPM="$(httpd -V | grep "Server MPM" | sed 's/^.*://' | sed 's/^[ \t]*//;s/[ \t]*$//')"
+SERVER_MPM="$(httpd -V &>1 | grep "Server MPM" | sed 's/^.*://' | sed 's/^[ \t]*//;s/[ \t]*$//')"
 
 # Get serverlimit configuration file
 CONFIGFILE="$(grep -i -r --include \*.conf -e "serverlimit" /etc/httpd/ | grep -v '^.*:.*#' | sed 's/:.*//')"
