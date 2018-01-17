@@ -7,7 +7,7 @@ CHECK_PROCS="/usr/local/nagios/libexec/check_procs"
 SERVER_MPM="$(httpd -V 2>&1 | grep "Server MPM" | sed 's/^.*://' | sed 's/^[ \t]*//;s/[ \t]*$//')"
 
 # Get serverlimit from configuration file
-CONFIGFILE="$(grep -i -r --include \*.conf -e "serverlimit" /etc/httpd/ | grep -v '^.*:.*#' | sed 's/:.*//')"
+CONFIGFILE="$(grep -i -r --include \*.conf -e "serverlimit" /etc/httpd/ | grep -v '^.*:.*#' | sed 's/:.*//' | uniq)"
 if [ "$CONFIGFILE" = "" ]
 then
   SERVERLIMIT=256
