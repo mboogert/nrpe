@@ -9,7 +9,7 @@ then
   exit 3
 fi
 
-if [[ `echo | nc -w 3 -vvv $IP $PORT | grep succeeded` ]]
+if [[ `echo | nc -z -w 3 -vvv $IP $PORT | grep succeeded` ]]
 then
   echo "OK: connection to IP $IP port $PORT succeeded"
   exit 0
