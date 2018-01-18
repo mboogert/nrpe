@@ -1,7 +1,9 @@
 #!/bin/sh
 
-author: Marcel Boogert
-source: https://github.com/mboogert/nrpe/blob/master/check_connection.sh
+#
+# author: Marcel Boogert
+# source: https://github.com/mboogert/nrpe/blob/master/check_connection.sh
+#
 
 IP="$1"
 PORT="$2"
