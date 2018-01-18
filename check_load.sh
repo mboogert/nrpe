@@ -1,5 +1,10 @@
 #!/bin/bash
 
+#
+# Author: Marcel Boogert
+# Source: https://github.com/mboogert/nrpe/blob/master/protim_check_load.sh
+#
+
 CHECK_LOAD="/usr/local/nagios/libexec/check_load"
 
 CPU_COUNT="$(grep processor /proc/cpuinfo | wc -l)"
