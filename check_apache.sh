@@ -1,5 +1,10 @@
 #!/bin/bash
 
+#
+# Author: Marcel Boogert
+# Source: https://github.com/mboogert/nrpe/blob/master/check_apache.sh
+#
+
 #CHECK_PROCS="/usr/lib64/nagios/plugins/check_procs"
 CHECK_PROCS="/usr/local/nagios/libexec/check_procs"
 
