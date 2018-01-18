@@ -1,4 +1,10 @@
 #!/bin/bash
+
+#
+# Author: Marcel Boogert
+# Source: https://github.com/mboogert/nrpe/blob/master/check_patch_status.sh
+#
+
 patch_status_status="$(cat /var/tmp/patch_status | sed 's/|.*$//')"
 patch_status_message="$(cat /var/tmp/patch_status | sed 's/^.*|//')"
 
