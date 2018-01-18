@@ -1,8 +1,8 @@
 #!/bin/sh
 
 #
-# author: Marcel Boogert
-# source: https://github.com/mboogert/nrpe/blob/master/check_connection.sh
+# Author: Marcel Boogert
+# Source: https://github.com/mboogert/nrpe/blob/master/check_connection.sh
 #
 
 IP="$1"
