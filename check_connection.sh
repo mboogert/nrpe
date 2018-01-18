@@ -14,7 +14,7 @@ then
   exit 3
 fi
 
-if [[ `nc -z -w 3 -vvv $IP $PORT` ]]
+if [[ `nc -z -w 3 $IP $PORT 2>&1` ]]
 then
   echo "OK: connection to IP $IP port $PORT succeeded"
   exit 0
