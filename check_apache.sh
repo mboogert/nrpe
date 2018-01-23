@@ -29,7 +29,7 @@ case "$SERVER_MPM" in
       SERVERLIMIT="$(echo "$PREFORK_CONFIG" | grep -v "^.*#" | grep -i serverlimit | tr '[:upper:]' '[:lower:]' | sed 's/^.*serverlimit.*[ \t]//')"
       
       # Add 1 to correct the check_procs output
-      SERVERLIMIT="$(echo $((SERVERLIMIT+1)))"
+      SERVERLIMIT_CHECK="$(echo $((SERVERLIMIT+1)))"
     fi
     
     # Calculate the adviced maximum memory assignment for apache,
@@ -59,8 +59,8 @@ case "$SERVER_MPM" in
 esac
     
 # Dynamically set warning and critical tresholds from configured serverlimit directive
-HTTPD_WARNING="$(awk -vp=$SERVERLIMIT -vq=0.90 'BEGIN{printf "%.0f" ,p * q}')"
-HTTPD_CRITICAL="$SERVERLIMIT"
+HTTPD_WARNING="$(awk -vp=$SERVERLIMIT_CHECK -vq=0.90 'BEGIN{printf "%.0f" ,p * q}')"
+HTTPD_CRITICAL="$SERVERLIMIT_CHECK"
 
 # Get and return the actual check output
 CHECK_OUTPUT="$($CHECK_PROCS -C httpd -w 1:$HTTPD_WARNING -c 1:$HTTPD_CRITICAL)"
