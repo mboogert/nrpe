@@ -17,7 +17,7 @@ SYSTEMMEMORYMB="$(echo $((SYSTEMMEMORY/1024)))"
 case "$SERVER_MPM" in
   "prefork")
     # Get the average httpd memory footprint
-    MEMORYFOOTPRINT="$(ps --no-headers -o "rss,cmd" -C httpd | awk '{ sum+=$1 } END { printf ("%d%s\n", sum/NR/1024,"M") }' || ps --no-headers -o "rss,cmd" -C /usr/sbin/httpd | awk '{ sum+=$1 } END { printf ("%d%s\n", sum/NR/1024,"M") }')"
+    MEMORYFOOTPRINT="$(ps --no-headers -o "rss,cmd" -C httpd | awk '{ sum+=$1 } END { printf ("%d\n", sum/NR/1024) }' || ps --no-headers -o "rss,cmd" -C /usr/sbin/httpd | awk '{ sum+=$1 } END { printf ("%d\n", sum/NR/1024) }')"
 
     # Get serverlimit from configuration file
     CONFIGFILE="$(grep -i -r --include \*.conf -e "serverlimit" /etc/httpd/ | grep -v '^.*:.*#' | sed 's/:.*//' | uniq)"
@@ -31,6 +31,11 @@ case "$SERVER_MPM" in
 
     # Add 1 to correct the check_procs output
     SERVERLIMIT_CHECK="$(echo $((SERVERLIMIT+1)))"
+
+    if [[ "$MEMORYFOOTPRINT" -eq 0 ]]
+    then
+      MEMORYFOOTPRINT=1
+    fi
     
     # Calculate the adviced maximum memory assignment for apache,
     #     calculation: (system memory - 1GB) / average apache memory + 10%
@@ -79,7 +84,7 @@ fi
 
 echo "Apache MPM                                       : $SERVER_MPM"
 echo "Apache ServerLimit                               : $SERVERLIMIT"
-echo "Apache process memory footprint                  : $MEMORYFOOTPRINT"
+echo "Apache process memory footprint                  : ${MEMORYFOOTPRINT}M"
 echo "Total system memory                              : ${SYSTEMMEMORYMB}M"
 echo "Adviced maximum ServerLimit                      : $SERVERLIMIT_ADVICE"
 echo " (SystemMemory - 1GB ) / MemoryFootprint + 10%"
