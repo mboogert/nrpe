@@ -46,6 +46,7 @@ case "$SERVER_MPM" in
   "event")
     MEMORYFOOTPRINT="1"
     SERVERLIMIT="256"
+    SERVERLIMIT_CHECK="256"
     SERVERLIMIT_ADVICE="256"
     ;;
 
@@ -53,6 +54,7 @@ case "$SERVER_MPM" in
     SERVER_MPM="<access denied, using default values>"
     MEMORYFOOTPRINT="1"
     SERVERLIMIT="256"
+    SERVERLIMIT_CHECK="256"
     SERVERLIMIT_ADVICE="256"
     ;;
     
