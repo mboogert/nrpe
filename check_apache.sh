@@ -27,6 +27,9 @@ case "$SERVER_MPM" in
     else
       PREFORK_CONFIG="$(sed -n -e '/<IfModule mpm_prefork_module>/I,/<\/IfModule>/I p;/<IfModule prefork.c>/I,/<\/IfModule>/I p' $CONFIGFILE | uniq)"
       SERVERLIMIT="$(echo "$PREFORK_CONFIG" | grep -v "^.*#" | grep -i serverlimit | tr '[:upper:]' '[:lower:]' | sed 's/^.*serverlimit.*[ \t]//')"
+      
+      # Add 1 to correct the check_procs output
+      SERVERLIMIT="$(echo $((SERVERLIMIT+1)))"
     fi
     
     # Calculate the adviced maximum memory assignment for apache,
