@@ -15,7 +15,7 @@ SYSTEMMEMORY="$(grep MemTotal /proc/meminfo | sed 's/^.*://' | sed 's/^[ \t]*//;
 SYSTEMMEMORYMB="$(echo $((SYSTEMMEMORY/1024)))"
     
 case "$SERVER_MPM" in
-  "worker")
+  "prefork")
     # Get the average httpd memory footprint
     MEMORYFOOTPRINT="$(ps --no-headers -o "rss,cmd" -C httpd | awk '{ sum+=$1 } END { printf ("%d%s\n", sum/NR/1024,"M") }' || ps --no-headers -o "rss,cmd" -C /usr/sbin/httpd | awk '{ sum+=$1 } END { printf ("%d%s\n", sum/NR/1024,"M") }')"
 
