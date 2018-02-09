@@ -5,8 +5,9 @@
 # Source: https://github.com/mboogert/nrpe/blob/master/check_patch_status.sh
 #
 
-patch_status_status="$(cat /var/tmp/patch_status | sed 's/|.*$//')"
-patch_status_message="$(cat /var/tmp/patch_status | sed 's/^.*|//')"
+patch_status_location="/var/run/patch_status"
+patch_status_status="$(cat $patch_status_location | sed 's/|.*$//')"
+patch_status_message="$(cat $patch_status_location | sed 's/^.*|//')"
 
 case "$patch_status_status" in
 
