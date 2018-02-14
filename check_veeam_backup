@@ -1,0 +1,36 @@
+#!/bin/bash
+
+DATE_NOW_EPOCH=$(date +%s)
+
+VEEAM_SESSION_LIST="$(veeamconfig session list)"
+
+LAST_BACKUP_RAW="$(echo "$VEEAM_SESSION_LIST" | grep "Backup" | sort -r -k7,8 | head -n 1)"
+LAST_BACKUP="$(echo "$LAST_BACKUP_RAW" | grep "Backup" | awk '{print $4,$7}' | sort -r | head -n 1)"
+LAST_BACKUP_STATUS="$(echo "$LAST_BACKUP" | awk '{print $1}')"
+
+LAST_BACKUP_DATE=$(echo $LAST_BACKUP_RAW | awk '{print $7,$8}')
+LAST_BACKUP_DATE_EPOCH=$(date -d "$LAST_BACKUP_DATE" +%s)
+LAST_BACKUP_DATE_WARNING=$(((DATE_NOW_EPOCH-86400)))
+LAST_BACKUP_DATE_CRITICAL=$(((DATE_NOW_EPOCH-172800)))
+
+if [[ "$LAST_BACKUP_STATUS" == "Success" ]]
+then
+  if [[ $LAST_BACKUP_DATE_EPOCH -lt $LAST_BACKUP_DATE_WARNING ]]
+  then
+    echo "WARNING: Last backup older than 24 hours \n\n$LAST_BACKUP_RAW"
+    exit 1
+  fi
+  if [[ $LAST_BACKUP_DATE_EPOCH -lt $LAST_BACKUP_DATE_CRITICAL ]]
+  then
+    echo "CRITICAL: Last backup older than 48 hours \n\n$LAST_BACKUP_RAW"
+    exit 2
+  fi
+  if [[ $LAST_BACKUP_DATE_EPOCH -ge $LAST_BACKUP_DATE_CRITICAL ]]
+  then
+    echo "OK: Last backup succesful within last 24 hours \n\n$LAST_BACKUP_RAW"
+    exit 0
+  fi
+else
+  echo "WARNING: Last backup failed \n\n$LAST_BACKUP_RAW"
+  exit 1
+fi
