@@ -141,8 +141,12 @@ main () {
     # Test if domain resolves to an ip
     if ! host ${DOMAIN} > /dev/null
     then
-      echo "UNKNOWN: host ${DOMAIN} cannot be resolved"
-      exit 3
+      # Retry after 10 seconds
+      sleep 10
+      if ! host ${DOMAIN} > /dev/null
+        echo "UNKNOWN: host ${DOMAIN} cannot be resolved"
+        exit 3
+      fi
     fi
 
     # Check SSL chain
