@@ -9,13 +9,13 @@
 WARNING="0.5"
 CRITICAL="1"
 TIMEOUT=5
-DELAY=0
 IPVERSION=4
 NTPCONF="/etc/ntp.conf"
 
 # get check_ntp binary
 if [ -x /usr/lib64/nagios/plugins/check_ntp_time ]; then
   CHECK_NTP="/usr/lib64/nagios/plugins/check_ntp_time"
+  DELAY=0
 elif [ -x /usr/local/nagios/libexec/check_ntp_time ]; then
   CHECK_NTP="/usr/local/nagios/libexec/check_ntp_time"
 else
@@ -35,7 +35,11 @@ status_unknown=0
 
 # get configured ntp servers
 for SERVER in `grep -e '^server *' $NTPCONF | sed 's/^.*server //' | sed 's/ .*$//'`; do
-  arr_retout[$SERVER]="$($CHECK_NTP --host=${SERVER} -${IPVERSION} --warning=${WARNING} --critical=${CRITICAL} --timeout=${TIMEOUT} --delay=${DELAY})"
+  if [ -n "$DELAY" ]; then
+    arr_retout[$SERVER]="$($CHECK_NTP --host=${SERVER} -${IPVERSION} --warning=${WARNING} --critical=${CRITICAL} --timeout=${TIMEOUT} --delay=${DELAY})"
+  else
+    arr_retout[$SERVER]="$($CHECK_NTP --host=${SERVER} -${IPVERSION} --warning=${WARNING} --critical=${CRITICAL} --timeout=${TIMEOUT})"
+  fi
   arr_retval[$SERVER]="$?"
   case "${arr_retval[$SERVER]}" in
     0)
