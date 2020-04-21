@@ -6,8 +6,8 @@
 #
 
 # define static variables
-WARNING="0.5"
-CRITICAL="1"
+WARNING="5"
+CRITICAL="10"
 TIMEOUT=5
 IPVERSION=4
 NTPCONF="/etc/ntp.conf"
@@ -66,8 +66,13 @@ elif [ $status_ok -eq 1 ]; then
   echo "WARNING: Only 1 NTP server is responding, server time is OK"
   RETVAL=1
 else
-  echo "CRITICAL: No NTP servers are responding"
-  RETVAL=2
+  if [ $status_warning -gt 0 ]; then
+    echo "WARNING: Not all NTP servers are responding correctly or time offset exceeded configured treshold"
+    RETVAL=1
+  else
+    echo "CRITICAL: No NTP servers are responding or time offset exceeded configured treshold"
+    RETVAL=2
+  fi
 fi
 
 echo ""
