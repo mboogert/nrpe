@@ -59,10 +59,13 @@ SERVERCOUNT="${#arr_retval[@]}"
 
 if [ $status_ok -eq $SERVERCOUNT ] || [ $status_ok -gt 1 ]; then
   echo "OK: Two or more configured NTP servers are responding correctly, server time is OK"
+  RETVAL=0
 elif [ $status_ok -eq 1 ]; then
   echo "WARNING: Only 1 NTP server is responding, server time is OK"
+  RETVAL=1
 else
   echo "CRITICAL: No NTP servers are responding"
+  RETVAL=2
 fi
 
 echo ""
@@ -72,3 +75,5 @@ do
   PERFDATA="$(echo ${arr_retout[$SERVER]} | sed 's/^.*|//')"
   echo "$SERVER - $DATA | ${SERVER}_${PERFDATA}"
 done
+
+exit $RETVAL
