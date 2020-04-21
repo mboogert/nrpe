@@ -8,27 +8,25 @@
 # define static variables
 WARNING="0.5"
 CRITICAL="1"
-JWARN="1:100"
-JCRIT="1:200"
-DELAY="1"
 TIMEOUT=5
+DELAY=0
 IPVERSION=4
 NTPCONF="/etc/ntp.conf"
 
 # get check_ntp binary
-if [ -x /usr/lib64/nagios/plugins/check_ntp ]; then
-  CHECK_NTP="/usr/lib64/nagios/plugins/check_ntp"
-elif [ -x /usr/local/nagios/libexec/check_ntp ]; then
-  CHECK_NTP="/usr/local/nagios/libexec/check_ntp"
+if [ -x /usr/lib64/nagios/plugins/check_ntp_time ]; then
+  CHECK_NTP="/usr/lib64/nagios/plugins/check_ntp_time"
+elif [ -x /usr/local/nagios/libexec/check_ntp_time ]; then
+  CHECK_NTP="/usr/local/nagios/libexec/check_ntp_time"
 else
-  echo "UNKNOWN: cannot find a suitable check_ntp binary"
+  echo "UNKNOWN: cannot find a suitable check_ntp_time binary"
   exit 3
 fi
 
 # declare an array
-declare -A arr_retout=()
-declare -A arr_retval=()
-declare -A arr_status_ok=()
+declare -A arr_retout
+declare -A arr_retval
+declare -A arr_status_ok
 
 status_ok=0
 status_warning=0
@@ -37,7 +35,7 @@ status_unknown=0
 
 # get configured ntp servers
 for SERVER in `grep -e '^server *' $NTPCONF | sed 's/^.*server //' | sed 's/ .*$//'`; do
-  arr_retout[$SERVER]="$($CHECK_NTP --host=${SERVER} -${IPVERSION} --warning=${WARNING} --critical=${CRITICAL} --delay=${DELAY} --timeout=${TIMEOUT})"
+  arr_retout[$SERVER]="$($CHECK_NTP --host=${SERVER} -${IPVERSION} --warning=${WARNING} --critical=${CRITICAL} --timeout=${TIMEOUT} --delay=${DELAY})"
   arr_retval[$SERVER]="$?"
   case "${arr_retval[$SERVER]}" in
     0)
